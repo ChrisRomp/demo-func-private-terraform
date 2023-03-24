@@ -25,7 +25,7 @@ vm_jumpbox_sku = "Standard_DS2_v2"
 vm_jumpbox_user = "azureuser"
 
 # STORAGE
-storage_account_name = "storcr1funcprivate"
+storage_account_name = "storcr1funcprivate02"
 
 # APP SERVICE PLAN
 app_plan_name = "asp-cr1-func-priv-02"

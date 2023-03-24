@@ -285,10 +285,10 @@ resource "azurerm_storage_account" "storage" {
 module "pe_blob" {
   source = "./modules/storage-pe"
 
-  rg_name = azurerm_resource_group.rg.name
-  vnet_name = azurerm_virtual_network.vnet.name
-  subnet_name = azurerm_subnet.snet_common.name
-  storage_account_name = azurerm_storage_account.storage.name
+  rg = azurerm_resource_group.rg
+  vnet = azurerm_virtual_network.vnet
+  subnet = azurerm_subnet.snet_common
+  storage_account = azurerm_storage_account.storage
   subresource = "blob"
 }
 
@@ -296,10 +296,10 @@ module "pe_blob" {
 module "pe_table" {
   source = "./modules/storage-pe"
 
-  rg_name = azurerm_resource_group.rg.name
-  vnet_name = azurerm_virtual_network.vnet.name
-  subnet_name = azurerm_subnet.snet_common.name
-  storage_account_name = azurerm_storage_account.storage.name
+  rg = azurerm_resource_group.rg
+  vnet = azurerm_virtual_network.vnet
+  subnet = azurerm_subnet.snet_common
+  storage_account = azurerm_storage_account.storage
   subresource = "table"
 }
 
@@ -307,10 +307,10 @@ module "pe_table" {
 module "pe_queue" {
   source = "./modules/storage-pe"
 
-  rg_name = azurerm_resource_group.rg.name
-  vnet_name = azurerm_virtual_network.vnet.name
-  subnet_name = azurerm_subnet.snet_common.name
-  storage_account_name = azurerm_storage_account.storage.name
+  rg = azurerm_resource_group.rg
+  vnet = azurerm_virtual_network.vnet
+  subnet = azurerm_subnet.snet_common
+  storage_account = azurerm_storage_account.storage
   subresource = "queue"
 }
 
@@ -318,10 +318,10 @@ module "pe_queue" {
 module "pe_file" {
   source = "./modules/storage-pe"
 
-  rg_name = azurerm_resource_group.rg.name
-  vnet_name = azurerm_virtual_network.vnet.name
-  subnet_name = azurerm_subnet.snet_common.name
-  storage_account_name = azurerm_storage_account.storage.name
+  rg = azurerm_resource_group.rg
+  vnet = azurerm_virtual_network.vnet
+  subnet = azurerm_subnet.snet_common
+  storage_account = azurerm_storage_account.storage
   subresource = "file"
 }
 

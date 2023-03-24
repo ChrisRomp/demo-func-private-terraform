@@ -1,24 +1,35 @@
-variable "rg_name" {
-  type = string
-  description = "Resource Group name."
+variable "rg" {
+  type = object({
+    name = string,
+    location = string
+  })
+  description = "Resource Group"
 }
 
-variable "vnet_name" {
-  type = string
-  description = "Virtual Network name."
+variable "vnet" {
+  type = object({
+    id = string,
+    name = string
+  })
+  description = "Virtual Network"
 }
 
-variable "subnet_name" {
-    type = string
-    description = "Subnet name."
+variable "subnet" {
+    type = object({
+        id = string
+    })
+    description = "Subnet"
 }
 
-variable "storage_account_name" {
-    type = string
-    description = "Storage Account name."
+variable "storage_account" {
+    type = object({
+        id = string,
+        name = string
+    })
+    description = "Storage Account"
 }
 
 variable "subresource" {
     type = string
-    description = "Subresource name."
+    description = "Subresource Name"
 }
