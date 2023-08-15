@@ -169,7 +169,7 @@ resource "azurerm_network_security_group" "nsg_common" {
   resource_group_name = azurerm_resource_group.rg.name
 }
 resource "azurerm_network_security_group" "nsg_appplan" {
-  name                = "nsg-common"
+  name                = "nsg-appplan"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 }
