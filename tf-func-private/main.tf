@@ -425,9 +425,12 @@ resource "azurerm_linux_function_app" "app" {
   service_plan_id = azurerm_service_plan.asp.id
 
   storage_account_name = azurerm_storage_account.storage.name
-  storage_account_access_key = azurerm_storage_account.storage.primary_access_key
+  storage_uses_managed_identity = true
 
+  public_network_access_enabled = false
   virtual_network_subnet_id = azurerm_subnet.snet_appplan.id
+
+  functions_extension_version = "~4"
 
   identity {
     type = "SystemAssigned"
@@ -441,12 +444,9 @@ resource "azurerm_linux_function_app" "app" {
   }
 
   app_settings = {
-    FUNCTIONS_EXTENSION_VERSION = "~4"
-    FUNCTIONS_WORKER_RUNTIME = "python"
     WEBSITE_CONTENTOVERVNET = "1"
     WEBSITE_CONTENTSHARE = azurerm_storage_share.share.name
     WEBSITE_CONTENTAZUREFILECONNECTIONSTRING = azurerm_storage_account.storage.primary_connection_string
-    AzureWebJobsStorage = azurerm_storage_account.storage.primary_connection_string
   }
 
   depends_on = [
