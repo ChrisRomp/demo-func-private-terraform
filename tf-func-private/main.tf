@@ -54,6 +54,12 @@ variable "bastion_name" {
   default = "bas-bastionhost"
 }
 
+variable "vm_pip_name" {
+  type = string
+  description = "VM Public IP name"
+  default = "pip-vm-jumpbox"
+}
+
 variable "vm_jumpbox_name" {
   type = string
   description = "Jump Box VM hostname"
@@ -156,39 +162,68 @@ resource "azurerm_subnet" "snet_bastion" {
   address_prefixes = [var.snet_bastion_cidr]
 }
 
+# https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/network_security_group.html
+resource "azurerm_network_security_group" "nsg_common" {
+  name                = "nsg-common"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+}
+resource "azurerm_network_security_group" "nsg_appplan" {
+  name                = "nsg-common"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+}
 
-### BASTION ###
+# https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association
+resource "azurerm_subnet_network_security_group_association" "snet_nsg_common" {
+  subnet_id                 = azurerm_subnet.snet_common.id
+  network_security_group_id = azurerm_network_security_group.nsg_common.id
+}
+resource "azurerm_subnet_network_security_group_association" "snet_nsg_appplan" {
+  subnet_id                 = azurerm_subnet.snet_appplan.id
+  network_security_group_id = azurerm_network_security_group.nsg_appplan.id
+}
+
+# ### BASTION ###
+# # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip
+# resource "azurerm_public_ip" "pip_bastion" {
+#   name                = var.bastion_pip_name
+#   location            = azurerm_resource_group.rg.location
+#   resource_group_name = azurerm_resource_group.rg.name
+#   allocation_method   = "Static"
+#   sku                 = "Standard"
+# }
+
+# # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/bastion_host
+# resource "azurerm_bastion_host" "bastion" {
+#   name                = var.bastion_name
+#   location            = azurerm_resource_group.rg.location
+#   resource_group_name = azurerm_resource_group.rg.name
+
+#   sku = "Standard"
+#   scale_units = 2
+#   copy_paste_enabled = true
+
+#   # Native client support
+#   tunneling_enabled = true
+
+#   ip_configuration {
+#     name                 = "bas-ip-configuration"
+#     subnet_id            = azurerm_subnet.snet_bastion.id
+#     public_ip_address_id = azurerm_public_ip.pip_bastion.id
+#   }
+# }
+
+
+### VIRTUAL MACHINE (Jump Box) ###
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip
-resource "azurerm_public_ip" "pip_bastion" {
-  name                = var.bastion_pip_name
+resource "azurerm_public_ip" "pip_vm_jumpbox" {
+  name                = var.vm_pip_name
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
   sku                 = "Standard"
 }
-
-# https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/bastion_host
-resource "azurerm_bastion_host" "bastion" {
-  name                = var.bastion_name
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-
-  sku = "Standard"
-  scale_units = 2
-  copy_paste_enabled = true
-
-  # Native client support
-  tunneling_enabled = true
-
-  ip_configuration {
-    name                 = "bas-ip-configuration"
-    subnet_id            = azurerm_subnet.snet_bastion.id
-    public_ip_address_id = azurerm_public_ip.pip_bastion.id
-  }
-}
-
-
-### VIRTUAL MACHINE (Jump Box) ###
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface
 resource "azurerm_network_interface" "nic_vm_jumpbox" {
   name                = "${var.vm_jumpbox_name}-nic"
@@ -199,6 +234,7 @@ resource "azurerm_network_interface" "nic_vm_jumpbox" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.snet_common.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.pip_vm_jumpbox.id
   }
 }
 
@@ -245,6 +281,7 @@ resource "azurerm_linux_virtual_machine" "vm_jumpbox" {
 }
 
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension
+# Connect with az ssh vm --resource-group myResourceGroup --name myVM
 resource "azurerm_virtual_machine_extension" "vm_jumpbox_aadlogin" {
   name                 = "AADSSHLogin"
   virtual_machine_id   = azurerm_linux_virtual_machine.vm_jumpbox.id
@@ -276,7 +313,9 @@ resource "azurerm_storage_account" "storage" {
   network_rules {
     default_action = "Deny"
     bypass         = ["AzureServices"]
-    # Allow local IP access for file share creation
+
+    # Allow agent's IP access for file share creation
+    # Not required if agent already has private network access
     ip_rules       = [chomp(data.http.myip.response_body)]
   }
 }
