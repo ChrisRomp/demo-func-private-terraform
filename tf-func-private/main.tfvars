@@ -20,6 +20,7 @@ bastion_pip_name = "pip-bas-cr1-func-priv-02"
 bastion_name = "bas-cr1-func-priv-02"
 
 # VM JUMPBOX
+vm_pip_name = "pip-vm-jumpbox-cr1-func-priv-02"
 vm_jumpbox_name = "vm-jumpbox-cr1-func-priv-02"
 vm_jumpbox_sku = "Standard_DS2_v2"
 vm_jumpbox_user = "azureuser"
