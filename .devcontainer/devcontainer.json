@@ -13,10 +13,12 @@
 				"ms-azuretools.vscode-bicep",
 				"hashicorp.terraform",
 				"ms-azuretools.vscode-azureterraform",
-				"GitHub.copilot-nightly"
+				"GitHub.copilot"
 			]
 		}
 	},
+
+	"postCreateCommand": "echo 'alias tf=terraform' > ~/.bash_aliases",
 	
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
